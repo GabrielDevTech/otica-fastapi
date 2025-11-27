@@ -37,10 +37,12 @@ main.py → routers → services (futuro)
 
 **Security Flow**:
 1. Request com Bearer Token
-2. `core/security.py` valida token via JWKS
-3. Extrai `org_id` do token
-4. Injeta `current_org_id` como dependency
-5. Router usa `current_org_id` para filtrar queries
+2. `core/security.py` limpa token (remove aspas, espaços, caracteres inválidos)
+3. `core/security.py` valida token via JWKS
+4. Extrai `org_id` do token (suporta `org_id` direto ou `o.id` do objeto organization)
+5. `core/permissions.py` valida role do usuário (RBAC)
+6. Injeta `current_org_id` e `current_staff` como dependencies
+7. Router usa `current_org_id` para filtrar queries e `current_staff` para verificar permissões
 
 ## Estrutura de Dados
 **StaffMember**:
