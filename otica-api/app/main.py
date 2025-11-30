@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers.v1 import staff
+from app.routers.v1 import staff, stores, departments, access_requests, invitations
 
 
 app = FastAPI(
@@ -24,6 +24,10 @@ app.add_middleware(
 
 # Routers
 app.include_router(staff.router, prefix="/api/v1")
+app.include_router(stores.router, prefix="/api/v1")
+app.include_router(departments.router, prefix="/api/v1")
+app.include_router(access_requests.router, prefix="/api/v1")
+app.include_router(invitations.router, prefix="/api/v1")
 
 
 @app.get("/")

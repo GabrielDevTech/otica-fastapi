@@ -1,5 +1,6 @@
 """Model de Staff (Equipe)."""
-from sqlalchemy import Column, Integer, String, Boolean, Enum, Index
+from sqlalchemy import Column, Integer, String, Boolean, Enum, Index, ForeignKey
+from sqlalchemy.orm import relationship
 import enum
 from app.models.base_class import BaseModel
 
@@ -22,12 +23,19 @@ class StaffMember(BaseModel):
     # CRÍTICO: MULTI-TENANCY
     organization_id = Column(String, nullable=False, index=True)
     
+    # Relacionamentos com Store e Department
+    store_id = Column(Integer, ForeignKey("stores.id", ondelete="SET NULL"), nullable=True, index=True)
+    department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=True, index=True)
+    
     full_name = Column(String, nullable=False)
     email = Column(String, nullable=False, index=True)  # Unique por Tenant via index composto
     role = Column(Enum(StaffRole), default=StaffRole.STAFF, nullable=False)
-    department = Column(String, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     avatar_url = Column(String, nullable=True)
+    
+    # Relationships
+    store = relationship("Store", backref="staff_members")
+    department = relationship("Department", backref="staff_members")
     
     __table_args__ = (
         # Garante email único DENTRO da mesma organização
