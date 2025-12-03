@@ -10,8 +10,9 @@ class StaffBase(BaseModel):
     full_name: str = Field(..., min_length=2)
     email: EmailStr
     role: StaffRole
-    store_id: Optional[int] = Field(None, description="ID da loja")
-    department_id: Optional[int] = Field(None, description="ID do setor")
+    store_id: int = Field(..., description="ID da loja (obrigatório)")
+    department_id: int = Field(..., description="ID do setor (obrigatório)")
+    job_title: Optional[str] = Field(None, description="Cargo específico")
     is_active: bool = True
 
 
@@ -26,8 +27,9 @@ class StaffInvite(BaseModel):
     full_name: str = Field(..., min_length=2)
     email: EmailStr
     role: StaffRole
-    store_id: Optional[int] = Field(None, description="ID da loja")
-    department_id: Optional[int] = Field(None, description="ID do setor")
+    store_id: int = Field(..., description="ID da loja (obrigatório)")
+    department_id: int = Field(..., description="ID do setor (obrigatório)")
+    job_title: Optional[str] = Field(None, description="Cargo específico")
 
 
 class StaffFilter(BaseModel):
@@ -41,8 +43,8 @@ class StaffFilter(BaseModel):
 class StaffResponse(StaffBase):
     """Schema de resposta para Staff."""
     id: int
-    organization_id: str
     clerk_id: Optional[str] = None
+    organization_id: str
     avatar_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime

@@ -12,6 +12,9 @@ from app.core.permissions import (
     require_staff_or_above
 )
 from app.models.staff_model import StaffMember, StaffRole
+from app.models.store_model import Store
+from app.models.department_model import Department
+from app.models.organization_model import Organization
 from app.schemas.staff_schema import (
     StaffCreate,
     StaffResponse,
@@ -96,6 +99,20 @@ async def get_staff_stats(
     )
 
 
+async def get_org_internal_id(db: AsyncSession, clerk_org_id: str) -> int:
+    """Obtém o ID interno da organização."""
+    result = await db.execute(
+        select(Organization).where(Organization.clerk_org_id == clerk_org_id)
+    )
+    org = result.scalar_one_or_none()
+    if not org:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organização não encontrada"
+        )
+    return org.id
+
+
 @router.post("", response_model=StaffResponse, status_code=status.HTTP_201_CREATED)
 async def create_staff(
     staff_data: StaffCreate,
@@ -111,6 +128,37 @@ async def create_staff(
     O organization_id é automaticamente injetado do token JWT.
     Qualquer organization_id enviado no corpo da requisição é ignorado.
     """
+    # Converter org_id para ID interno
+    org_id = await get_org_internal_id(db, current_org_id)
+    
+    # Validar se store pertence à organização
+    store_result = await db.execute(
+        select(Store).where(
+            Store.id == staff_data.store_id,
+            Store.organization_id == org_id
+        )
+    )
+    store = store_result.scalar_one_or_none()
+    if not store:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Loja não encontrada ou não pertence à organização"
+        )
+    
+    # Validar se department pertence à organização
+    dept_result = await db.execute(
+        select(Department).where(
+            Department.id == staff_data.department_id,
+            Department.organization_id == org_id
+        )
+    )
+    department = dept_result.scalar_one_or_none()
+    if not department:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Setor não encontrado ou não pertence à organização"
+        )
+    
     # Verifica se email já existe na organização
     existing = await db.execute(
         select(StaffMember).where(

@@ -6,8 +6,8 @@ from datetime import datetime
 
 class DepartmentBase(BaseModel):
     """Schema base de Department."""
-    name: str = Field(..., min_length=2, max_length=255, description="Nome do setor")
-    is_active: bool = Field(default=True)
+    name: str = Field(..., min_length=1, max_length=255)
+    description: Optional[str] = Field(None, description="Descrição do setor")
 
 
 class DepartmentCreate(DepartmentBase):
@@ -17,7 +17,8 @@ class DepartmentCreate(DepartmentBase):
 
 class DepartmentUpdate(BaseModel):
     """Schema para atualizar um Department."""
-    name: Optional[str] = Field(None, min_length=2, max_length=255)
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
     is_active: Optional[bool] = None
 
 
@@ -25,6 +26,7 @@ class DepartmentResponse(DepartmentBase):
     """Schema de resposta de Department."""
     id: int
     organization_id: int
+    is_active: bool
     created_at: datetime
     updated_at: datetime
 
