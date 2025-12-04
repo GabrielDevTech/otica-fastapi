@@ -22,6 +22,17 @@ class StaffCreate(StaffBase):
     pass
 
 
+class StaffUpdate(BaseModel):
+    """Schema para atualizar Staff."""
+    full_name: Optional[str] = Field(None, min_length=2)
+    email: Optional[EmailStr] = None
+    role: Optional[StaffRole] = None
+    store_id: Optional[int] = Field(None, description="ID da loja")
+    department_id: Optional[int] = Field(None, description="ID do setor")
+    job_title: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
 class StaffInvite(BaseModel):
     """Schema para convidar um novo Staff (admin cria direto)."""
     full_name: str = Field(..., min_length=2)

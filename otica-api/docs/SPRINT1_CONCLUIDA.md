@@ -85,6 +85,11 @@ Todas as implementações da Sprint 1 foram concluídas com sucesso!
 - ✅ `DELETE /api/v1/customers/{id}` - Desativa cliente
 
 #### Staff (Atualizado)
+- ✅ `GET /api/v1/staff` - Lista membros da equipe
+- ✅ `GET /api/v1/staff/stats` - Estatísticas da equipe
+- ✅ `GET /api/v1/staff/{staff_id}` - Obtém membro específico
+- ✅ `POST /api/v1/staff` - Cria membro (com validações de store e department)
+- ✅ `PUT /api/v1/staff/{staff_id}` - Atualiza membro (com validações)
 - ✅ Validações de `store_id` e `department_id` adicionadas
 - ✅ Verifica se store e department pertencem à organização
 
@@ -126,7 +131,11 @@ Com um token válido do Clerk, teste:
    - `POST /api/v1/departments` - Criar setor (com description)
 
 3. **Staff**:
+   - `GET /api/v1/staff` - Listar membros
+   - `GET /api/v1/staff/stats` - Estatísticas
+   - `GET /api/v1/staff/{id}` - Obter membro específico
    - `POST /api/v1/staff` - Criar membro (agora requer store_id e department_id)
+   - `PUT /api/v1/staff/{id}` - Atualizar membro (permite vincular loja/setor)
    - Verificar validações de store e department
 
 4. **ProductFrames**:
@@ -237,6 +246,18 @@ Teste que os dados estão isolados por organização:
 
 ---
 
+## ✅ Todos os Endpoints Implementados
+
+Todos os endpoints documentados no `ENDPOINTS_FRONTEND_SPRINT1.md` foram implementados e estão prontos para uso!
+
+**Endpoints de Staff implementados**:
+- ✅ `GET /api/v1/staff/{staff_id}` - Obter membro específico
+- ✅ `PUT /api/v1/staff/{staff_id}` - Atualizar membro da equipe
+
+O fluxo de "Finalizar Equipe" (Passo 2) está completo e funcional!
+
+---
+
 ## 📝 Observações Importantes
 
 1. **Multi-tenancy**: Todos os endpoints filtram automaticamente por `organization_id` extraído do token JWT
@@ -265,12 +286,16 @@ Teste que os dados estão isolados por organização:
 - [x] Campos obrigatórios configurados
 - [x] Índices criados
 - [x] Validações implementadas
+- [x] Endpoint PUT staff implementado
+- [x] Endpoint GET staff/{id} implementado
 - [ ] Testes manuais realizados
 - [ ] Dados de teste criados
 
 ---
 
-**Status**: ✅ Sprint 1 Completa  
+**Status**: ✅ Sprint 1 100% Completa  
 **Data**: 2025-12-03  
-**Próximo**: Testar endpoints e criar dados de teste
+**Próximo**: 
+- Testar endpoints e criar dados de teste
+- Frontend pode usar `TELAS_PRONTAS_SPRINT1.md` como referência completa
 

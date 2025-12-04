@@ -17,6 +17,7 @@ from app.models.department_model import Department
 from app.models.organization_model import Organization
 from app.schemas.staff_schema import (
     StaffCreate,
+    StaffUpdate,
     StaffResponse,
     StaffFilter,
     StaffStats
@@ -183,4 +184,124 @@ async def create_staff(
     await db.refresh(new_staff)
     
     return new_staff
+
+
+@router.get("/{staff_id}", response_model=StaffResponse)
+async def get_staff(
+    staff_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_org_id: str = Depends(get_current_org_id),
+    current_staff: StaffMember = Depends(require_staff_or_above),
+):
+    """
+    Obtém um membro específico da equipe.
+    
+    **Permissões**: STAFF, MANAGER ou ADMIN
+    """
+    result = await db.execute(
+        select(StaffMember).where(
+            StaffMember.id == staff_id,
+            StaffMember.organization_id == current_org_id
+        )
+    )
+    staff = result.scalar_one_or_none()
+    
+    if not staff:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Membro da equipe não encontrado"
+        )
+    
+    return staff
+
+
+@router.put("/{staff_id}", response_model=StaffResponse)
+async def update_staff(
+    staff_id: int,
+    staff_data: StaffUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_org_id: str = Depends(get_current_org_id),
+    current_staff: StaffMember = Depends(require_admin),
+):
+    """
+    Atualiza um membro da equipe.
+    
+    **Permissões**: ADMIN apenas
+    
+    Permite atualizar campos do membro, especialmente para vincular loja e setor.
+    Se store_id ou department_id forem fornecidos, valida se pertencem à organização.
+    """
+    # Busca o membro
+    result = await db.execute(
+        select(StaffMember).where(
+            StaffMember.id == staff_id,
+            StaffMember.organization_id == current_org_id
+        )
+    )
+    staff = result.scalar_one_or_none()
+    
+    if not staff:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Membro da equipe não encontrado"
+        )
+    
+    # Converter org_id para ID interno (se precisar validar store/department)
+    update_data = staff_data.model_dump(exclude_unset=True)
+    
+    # Se store_id está sendo atualizado, validar
+    if "store_id" in update_data:
+        org_id = await get_org_internal_id(db, current_org_id)
+        store_result = await db.execute(
+            select(Store).where(
+                Store.id == update_data["store_id"],
+                Store.organization_id == org_id
+            )
+        )
+        store = store_result.scalar_one_or_none()
+        if not store:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Loja não encontrada ou não pertence à organização"
+            )
+    
+    # Se department_id está sendo atualizado, validar
+    if "department_id" in update_data:
+        org_id = await get_org_internal_id(db, current_org_id)
+        dept_result = await db.execute(
+            select(Department).where(
+                Department.id == update_data["department_id"],
+                Department.organization_id == org_id
+            )
+        )
+        department = dept_result.scalar_one_or_none()
+        if not department:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Setor não encontrado ou não pertence à organização"
+            )
+    
+    # Se email está sendo atualizado, verificar se já existe
+    if "email" in update_data and update_data["email"] != staff.email:
+        existing = await db.execute(
+            select(StaffMember).where(
+                StaffMember.organization_id == current_org_id,
+                StaffMember.email == update_data["email"],
+                StaffMember.id != staff_id  # Excluir o próprio membro
+            )
+        )
+        if existing.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email já cadastrado nesta organização"
+            )
+    
+    # Atualiza apenas campos fornecidos
+    for field, value in update_data.items():
+        setattr(staff, field, value)
+    
+    await db.commit()
+    await db.refresh(staff)
+    
+    return staff
 
