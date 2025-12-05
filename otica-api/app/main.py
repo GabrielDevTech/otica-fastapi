@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers.v1 import staff, stores, departments, access_requests, invitations
+from app.routers.v1 import staff, stores, departments, access_requests, invitations, service_orders
 
 
 app = FastAPI(
@@ -28,6 +28,7 @@ app.include_router(stores.router, prefix="/api/v1")
 app.include_router(departments.router, prefix="/api/v1")
 app.include_router(access_requests.router, prefix="/api/v1")
 app.include_router(invitations.router, prefix="/api/v1")
+app.include_router(service_orders.router, prefix="/api/v1")
 
 
 @app.get("/")
