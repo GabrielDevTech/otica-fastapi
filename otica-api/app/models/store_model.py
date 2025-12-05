@@ -1,5 +1,5 @@
 """Model de Store (Loja)."""
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Numeric, JSON
 from sqlalchemy.orm import relationship
 from app.models.base_class import BaseModel
 
@@ -11,8 +11,12 @@ class Store(BaseModel):
     
     organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     name = Column(String(255), nullable=False)
-    address = Column(String, nullable=True)
+    
+    # NOVOS CAMPOS
+    address_data = Column(JSON, nullable=True, doc="Endereço completo em JSON")
     phone = Column(String(20), nullable=True)
+    tax_rate_machine = Column(Numeric(5, 2), nullable=True, doc="Taxa da máquina de cartão (ex: 2.5)")
+    
     is_active = Column(Boolean, default=True, nullable=False)
     
     # Relationships

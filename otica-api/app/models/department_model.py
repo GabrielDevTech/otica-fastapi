@@ -1,5 +1,5 @@
 """Model de Department (Setor)."""
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from app.models.base_class import BaseModel
 
@@ -11,6 +11,10 @@ class Department(BaseModel):
     
     organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     name = Column(String(255), nullable=False)
+    
+    # NOVO CAMPO
+    description = Column(Text, nullable=True, doc="Descrição do setor")
+    
     is_active = Column(Boolean, default=True, nullable=False)
     
     # Relationships

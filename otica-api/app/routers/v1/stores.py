@@ -166,7 +166,7 @@ async def update_store(
     return store
 
 
-@router.delete("/{store_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{store_id}", status_code=status.HTTP_200_OK)
 async def delete_store(
     store_id: int,
     db: AsyncSession = Depends(get_db),
@@ -177,6 +177,8 @@ async def delete_store(
     Desativa uma loja (soft delete).
     
     **Permissões**: ADMIN apenas
+    
+    Retorna 200 em vez de 204 para compatibilidade com proxy Next.js.
     """
     org_id = await get_org_internal_id(db, current_org_id)
     
@@ -196,4 +198,6 @@ async def delete_store(
     
     store.is_active = False
     await db.commit()
+    
+    return {"message": "Loja deletada com sucesso", "id": store_id}
 

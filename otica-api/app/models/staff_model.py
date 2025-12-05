@@ -11,6 +11,7 @@ class StaffRole(str, enum.Enum):
     MANAGER = "MANAGER"
     STAFF = "STAFF"
     ASSISTANT = "ASSISTANT"
+    SELLER = "SELLER"  # Vendedor
 
 
 class StaffMember(BaseModel):
@@ -23,13 +24,14 @@ class StaffMember(BaseModel):
     # CRÍTICO: MULTI-TENANCY
     organization_id = Column(String, nullable=False, index=True)
     
-    # Relacionamentos com Store e Department
-    store_id = Column(Integer, ForeignKey("stores.id", ondelete="SET NULL"), nullable=True, index=True)
-    department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=True, index=True)
+    # Relacionamentos com Store e Department (OBRIGATÓRIOS)
+    store_id = Column(Integer, ForeignKey("stores.id", ondelete="SET NULL"), nullable=False, index=True)
+    department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=False, index=True)
     
     full_name = Column(String, nullable=False)
     email = Column(String, nullable=False, index=True)  # Unique por Tenant via index composto
     role = Column(Enum(StaffRole), default=StaffRole.STAFF, nullable=False)
+    job_title = Column(String, nullable=True, index=True, doc="Cargo específico (ex: Vendedor, Motoboy)")
     is_active = Column(Boolean, default=True, nullable=False)
     avatar_url = Column(String, nullable=True)
     

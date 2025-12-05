@@ -2,7 +2,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers.v1 import staff, stores, departments, access_requests, invitations, service_orders
+from app.routers.v1 import (
+    staff, stores, departments, access_requests, invitations,
+    product_frames, product_lenses, customers, service_orders
+)
 
 
 app = FastAPI(
@@ -14,12 +17,24 @@ app = FastAPI(
 )
 
 # CORS
+# Se não houver origens configuradas, usar lista padrão
+cors_origins = settings.cors_origins_list if settings.cors_origins_list else [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8080",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8080",
+    "http://192.168.0.100:3000",  # IP local da rede
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Routers
@@ -28,6 +43,9 @@ app.include_router(stores.router, prefix="/api/v1")
 app.include_router(departments.router, prefix="/api/v1")
 app.include_router(access_requests.router, prefix="/api/v1")
 app.include_router(invitations.router, prefix="/api/v1")
+app.include_router(product_frames.router, prefix="/api/v1")
+app.include_router(product_lenses.router, prefix="/api/v1")
+app.include_router(customers.router, prefix="/api/v1")
 app.include_router(service_orders.router, prefix="/api/v1")
 
 

@@ -10,8 +10,9 @@ class StaffBase(BaseModel):
     full_name: str = Field(..., min_length=2)
     email: EmailStr
     role: StaffRole
-    store_id: Optional[int] = Field(None, description="ID da loja")
-    department_id: Optional[int] = Field(None, description="ID do setor")
+    store_id: int = Field(..., description="ID da loja (obrigatório)")
+    department_id: int = Field(..., description="ID do setor (obrigatório)")
+    job_title: Optional[str] = Field(None, description="Cargo específico")
     is_active: bool = True
 
 
@@ -21,13 +22,25 @@ class StaffCreate(StaffBase):
     pass
 
 
+class StaffUpdate(BaseModel):
+    """Schema para atualizar Staff."""
+    full_name: Optional[str] = Field(None, min_length=2)
+    email: Optional[EmailStr] = None
+    role: Optional[StaffRole] = None
+    store_id: Optional[int] = Field(None, description="ID da loja")
+    department_id: Optional[int] = Field(None, description="ID do setor")
+    job_title: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
 class StaffInvite(BaseModel):
     """Schema para convidar um novo Staff (admin cria direto)."""
     full_name: str = Field(..., min_length=2)
     email: EmailStr
     role: StaffRole
-    store_id: Optional[int] = Field(None, description="ID da loja")
-    department_id: Optional[int] = Field(None, description="ID do setor")
+    store_id: int = Field(..., description="ID da loja (obrigatório)")
+    department_id: int = Field(..., description="ID do setor (obrigatório)")
+    job_title: Optional[str] = Field(None, description="Cargo específico")
 
 
 class StaffFilter(BaseModel):
@@ -41,8 +54,8 @@ class StaffFilter(BaseModel):
 class StaffResponse(StaffBase):
     """Schema de resposta para Staff."""
     id: int
-    organization_id: str
     clerk_id: Optional[str] = None
+    organization_id: str
     avatar_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
