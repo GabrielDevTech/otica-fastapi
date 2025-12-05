@@ -137,14 +137,18 @@ async def update_product_lens(
     return lens
 
 
-@router.delete("/{lens_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{lens_id}", status_code=status.HTTP_200_OK)
 async def delete_product_lens(
     lens_id: int,
     db: AsyncSession = Depends(get_db),
     current_org_id: str = Depends(get_current_org_id),
     current_staff: StaffMember = Depends(require_admin),
 ):
-    """Desativa uma lente (soft delete)."""
+    """
+    Desativa uma lente (soft delete).
+    
+    Retorna 200 em vez de 204 para compatibilidade com proxy Next.js.
+    """
     result = await db.execute(
         select(ProductLens).where(
             ProductLens.id == lens_id,
@@ -161,4 +165,6 @@ async def delete_product_lens(
     
     lens.is_active = False
     await db.commit()
+    
+    return {"message": "Lente deletada com sucesso", "id": lens_id}
 

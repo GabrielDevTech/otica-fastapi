@@ -193,14 +193,18 @@ async def update_product_frame(
     return frame
 
 
-@router.delete("/{frame_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{frame_id}", status_code=status.HTTP_200_OK)
 async def delete_product_frame(
     frame_id: int,
     db: AsyncSession = Depends(get_db),
     current_org_id: str = Depends(get_current_org_id),
     current_staff: StaffMember = Depends(require_admin),
 ):
-    """Desativa uma armação (soft delete)."""
+    """
+    Desativa uma armação (soft delete).
+    
+    Retorna 200 em vez de 204 para compatibilidade com proxy Next.js.
+    """
     result = await db.execute(
         select(ProductFrame).where(
             ProductFrame.id == frame_id,
@@ -217,4 +221,6 @@ async def delete_product_frame(
     
     frame.is_active = False
     await db.commit()
+    
+    return {"message": "Armação deletada com sucesso", "id": frame_id}
 

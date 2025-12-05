@@ -36,6 +36,7 @@ class Customer(BaseModel):
     
     __table_args__ = (
         # Garante CPF único por organização
+        # NOTA: O sistema reativa clientes deletados ao invés de criar novos
         Index('idx_customer_org_cpf', 'organization_id', 'cpf', unique=True),
         Index('idx_customer_org_name', 'organization_id', 'full_name'),
     )
