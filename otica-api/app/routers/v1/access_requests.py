@@ -19,7 +19,8 @@ from app.schemas.access_request_schema import (
     AccessRequestResponse,
     AccessRequestWithOrg
 )
-from app.services.clerk_service import get_clerk_service, ClerkService
+from app.services.auth_service import get_auth_service
+from app.core.auth.base_auth_provider import BaseAuthProvider
 
 
 router = APIRouter(prefix="/access-requests", tags=["access-requests"])
@@ -301,7 +302,7 @@ async def approve_access_request(
     db: AsyncSession = Depends(get_db),
     current_org_id: str = Depends(get_current_org_id),
     current_staff: StaffMember = Depends(require_admin),
-    clerk_service: ClerkService = Depends(get_clerk_service),
+    auth_service: BaseAuthProvider = Depends(get_auth_service),
 ):
     """
     Aprova uma solicitação de acesso.
@@ -348,7 +349,7 @@ async def approve_access_request(
     
     try:
         # 1. Cria convite no Clerk
-        invitation = await clerk_service.create_user_invitation(
+        invitation = await auth_service.create_user_invitation(
             email=request.email,
             organization_id=org.clerk_org_id,
             role=clerk_role

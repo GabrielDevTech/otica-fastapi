@@ -6,10 +6,19 @@ from typing import List
 class Settings(BaseSettings):
     """Configurações da aplicação carregadas do .env."""
     
+    # Auth Provider
+    AUTH_PROVIDER: str = "clerk"  # clerk ou supabase
+    
     # Clerk
-    CLERK_ISSUER: str
+    CLERK_ISSUER: str | None = None
     CLERK_PUBLISHABLE_KEY: str | None = None  # Opcional, para uso futuro
     CLERK_SECRET_KEY: str | None = None  # Opcional, para uso futuro
+    
+    # Supabase Auth
+    SUPABASE_URL: str | None = None
+    SUPABASE_ANON_KEY: str | None = None
+    SUPABASE_SERVICE_KEY: str | None = None  # Admin key para operações de gerenciamento
+    SUPABASE_JWT_SECRET: str | None = None  # JWT Secret para validar tokens de acesso (HS256)
     
     # Database
     DATABASE_URL: str

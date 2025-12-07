@@ -10,7 +10,8 @@ from app.models.store_model import Store
 from app.models.department_model import Department
 from app.models.staff_model import StaffMember, StaffRole
 from app.schemas.staff_schema import StaffInvite, StaffResponse
-from app.services.clerk_service import get_clerk_service, ClerkService
+from app.services.auth_service import get_auth_service
+from app.core.auth.base_auth_provider import BaseAuthProvider
 
 
 router = APIRouter(prefix="/invitations", tags=["invitations"])
@@ -39,7 +40,7 @@ async def invite_user(
     db: AsyncSession = Depends(get_db),
     current_org_id: str = Depends(get_current_org_id),
     current_staff: StaffMember = Depends(require_admin),
-    clerk_service: ClerkService = Depends(get_clerk_service),
+    auth_service: BaseAuthProvider = Depends(get_auth_service),
 ):
     """
     Convida um novo usuário diretamente (sem solicitação).
@@ -98,8 +99,8 @@ async def invite_user(
         clerk_role = "org:admin"
     
     try:
-        # 1. Cria convite no Clerk
-        invitation = await clerk_service.create_user_invitation(
+        # 1. Cria convite no provider de autenticação
+        invitation = await auth_service.create_user_invitation(
             email=invite_data.email,
             organization_id=org.clerk_org_id,
             role=clerk_role
@@ -141,7 +142,7 @@ async def resend_invitation(
     db: AsyncSession = Depends(get_db),
     current_org_id: str = Depends(get_current_org_id),
     current_staff: StaffMember = Depends(require_admin),
-    clerk_service: ClerkService = Depends(get_clerk_service),
+    auth_service: BaseAuthProvider = Depends(get_auth_service),
 ):
     """
     Reenvia convite para um usuário que ainda não aceitou.
@@ -178,7 +179,7 @@ async def resend_invitation(
     
     try:
         # Reenvia convite
-        invitation = await clerk_service.create_user_invitation(
+        invitation = await auth_service.create_user_invitation(
             email=staff.email,
             organization_id=org.clerk_org_id,
             role=clerk_role

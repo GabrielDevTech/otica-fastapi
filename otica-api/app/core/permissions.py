@@ -5,47 +5,26 @@ from sqlalchemy import select
 from app.core.database import get_db
 from app.core.security import get_current_org_id, get_current_user_id
 from app.models.staff_model import StaffMember, StaffRole
-import httpx
-from app.core.config import settings
 
 
-async def get_user_email_from_clerk(user_id: str) -> str | None:
+async def get_user_email_from_auth_provider(user_id: str) -> str | None:
     """
-    Busca o email do usuário na API do Clerk.
+    Busca o email do usuário usando o provider de autenticação configurado.
     
     Usado quando precisamos vincular um staff_member (criado por convite)
-    ao clerk_id do usuário que acabou de criar sua conta.
-    """
-    if not settings.CLERK_SECRET_KEY:
-        print("⚠️ CLERK_SECRET_KEY não configurado")
-        return None
+    ao auth_user_id do usuário que acabou de criar sua conta.
     
+    Funciona com qualquer provider (Clerk, Supabase, etc.).
+    """
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"https://api.clerk.com/v1/users/{user_id}",
-                headers={
-                    "Authorization": f"Bearer {settings.CLERK_SECRET_KEY}",
-                    "Content-Type": "application/json"
-                }
-            )
-            
-            if response.status_code == 200:
-                user_data = response.json()
-                email_addresses = user_data.get("email_addresses", [])
-                if email_addresses:
-                    primary = next(
-                        (e for e in email_addresses if e.get("id") == user_data.get("primary_email_address_id")),
-                        email_addresses[0]
-                    )
-                    email = primary.get("email_address")
-                    print(f"📧 Email encontrado no Clerk para {user_id}: {email}")
-                    return email
-            else:
-                print(f"⚠️ Clerk API retornou {response.status_code}: {response.text}")
-            return None
+        from app.core.auth.auth_factory import get_auth_provider
+        provider = get_auth_provider()
+        email = await provider.get_user_email(user_id)
+        if email:
+            print(f"📧 Email encontrado no provider para {user_id}: {email}")
+        return email
     except Exception as e:
-        print(f"❌ Erro ao buscar email do Clerk: {e}")
+        print(f"❌ Erro ao buscar email do provider: {e}")
         return None
 
 
@@ -80,7 +59,7 @@ async def get_current_staff(
     print(f"⚠️ Staff não encontrado pelo clerk_id, tentando pelo email...")
     
     # 2. Se não encontrou pelo clerk_id, busca pelo email
-    user_email = await get_user_email_from_clerk(current_user_id)
+    user_email = await get_user_email_from_auth_provider(current_user_id)
     
     if user_email:
         result = await db.execute(
