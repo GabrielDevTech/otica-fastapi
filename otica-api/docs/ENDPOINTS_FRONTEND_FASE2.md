@@ -257,9 +257,9 @@ null
 ```
 
 **Ações Disponíveis**:
-- `ACCEPT_LOSS`: A loja assume o prejuízo (cria despesa automática)
-- `CHARGE_STAFF`: Gera conta a receber contra o vendedor
-- `CORRECT_VALUE`: Ajusta o valor calculado (ex: vendedor esqueceu de lançar sangria)
+- `ACCEPT_LOSS`: A loja assume o prejuízo (cria despesa automática) - **TODO: Será implementado no módulo financeiro (Fase 3)**
+- `CHARGE_STAFF`: Gera conta a receber contra o vendedor - **TODO: Será implementado no módulo financeiro (Fase 3)**
+- `CORRECT_VALUE`: Ajusta o valor calculado (ex: vendedor esqueceu de lançar sangria) - **Funcional**
 
 **Response 200 OK**:
 ```json
@@ -278,6 +278,9 @@ null
 **Erros**:
 - `400 Bad Request`: Sessão não está em `PENDING_AUDIT`
 - `400 Bad Request`: `corrected_value` obrigatório se `action = CORRECT_VALUE`
+- `404 Not Found`: Sessão não encontrada
+
+**Nota**: As ações `ACCEPT_LOSS` e `CHARGE_STAFF` estão marcadas como TODO no backend e serão implementadas na Fase 3 (módulo financeiro). Por enquanto, apenas `CORRECT_VALUE` está totalmente funcional.
 
 ---
 
@@ -765,8 +768,9 @@ null
    - `card_net_amount` = `total_amount * (1 - tax_rate_machine/100)`
 
 3. **Pix/Crediário (PIX/CREDIT)**:
-   - Cria `ReceivableAccount` (conta a receber)
+   - Cria `ReceivableAccount` (conta a receber) automaticamente
    - `receivable_account_id` é preenchido
+   - Data de vencimento padrão: 30 dias a partir da data atual (pode ser configurável no futuro)
 
 4. **Baixa de Estoque**:
    - Converte `reserved_quantity` em baixa real
@@ -1052,5 +1056,34 @@ null
 
 ---
 
-**Status**: ✅ Documentação Completa - Pronto para Implementação Frontend
+**Status**: ✅ Documentação Completa e Atualizada - Pronto para Implementação Frontend
+
+**Última Atualização**: 2024-12-04
+**Versão da API**: 1.0.0 (Fase 2 - Ciclo de Venda)
+
+---
+
+## 📌 Notas Importantes para o Frontend
+
+### TODOs do Backend (Fase 3)
+- Ações `ACCEPT_LOSS` e `CHARGE_STAFF` na auditoria de caixa (marcadas como TODO)
+- Lançamentos financeiros automáticos (entrada/saída de caixa)
+- Cálculo de comissões
+- Cron job para liberar reservas expiradas (24h)
+
+### Funcionalidades Completas
+- ✅ Todos os endpoints de Cash Sessions
+- ✅ Todos os endpoints de Cash Movements
+- ✅ Todos os endpoints de Service Orders
+- ✅ Busca unificada de produtos
+- ✅ Checkout/Pagamento (CASH, CARD, PIX, CREDIT)
+- ✅ Fila de Laboratório (Kanban)
+- ✅ Contas a Receber (criação automática)
+- ✅ Kardex (histórico de movimentação)
+
+### Validações Importantes
+- **Estoque**: Backend valida estoque antes de reservar/baixar
+- **Permissões**: SELLER só vê/edita suas próprias OS e sessões
+- **Status**: Transições de status são validadas pelo backend
+- **Desconto**: Descontos acima de 10% requerem aprovação de MANAGER/ADMIN
 

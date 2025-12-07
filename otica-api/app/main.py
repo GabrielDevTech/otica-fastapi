@@ -4,7 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers.v1 import (
     staff, stores, departments, access_requests, invitations,
-    product_frames, product_lenses, customers
+    product_frames, product_lenses, customers,
+    cash_sessions, cash_movements, service_orders, products,
+    sales, lab, receivable_accounts, kardex
 )
 
 
@@ -46,6 +48,15 @@ app.include_router(invitations.router, prefix="/api/v1")
 app.include_router(product_frames.router, prefix="/api/v1")
 app.include_router(product_lenses.router, prefix="/api/v1")
 app.include_router(customers.router, prefix="/api/v1")
+# Fase 2 - Ciclo de Venda
+app.include_router(cash_sessions.router, prefix="/api/v1")
+app.include_router(cash_movements.router, prefix="/api/v1")
+app.include_router(service_orders.router, prefix="/api/v1")
+app.include_router(products.router, prefix="/api/v1")
+app.include_router(sales.router, prefix="/api/v1")
+app.include_router(lab.router, prefix="/api/v1")
+app.include_router(receivable_accounts.router, prefix="/api/v1")
+app.include_router(kardex.router, prefix="/api/v1")
 
 
 @app.get("/")

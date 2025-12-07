@@ -132,4 +132,4 @@ def require_role(*allowed_roles: StaffRole):
 # Dependencies pré-configuradas para roles comuns
 require_admin = require_role(StaffRole.ADMIN)
 require_manager_or_admin = require_role(StaffRole.ADMIN, StaffRole.MANAGER)
-require_staff_or_above = require_role(StaffRole.ADMIN, StaffRole.MANAGER, StaffRole.STAFF)
+require_staff_or_above = require_role(StaffRole.ADMIN, StaffRole.MANAGER, StaffRole.STAFF, StaffRole.SELLER)

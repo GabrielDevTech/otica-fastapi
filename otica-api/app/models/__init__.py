@@ -10,6 +10,13 @@ from app.models.inventory_level_model import InventoryLevel
 from app.models.product_lens_model import ProductLens
 from app.models.lens_stock_grid_model import LensStockGrid
 from app.models.customer_model import Customer
+from app.models.cash_session_model import CashSession, CashSessionStatus
+from app.models.cash_movement_model import CashMovement, CashMovementType
+from app.models.service_order_model import ServiceOrder, ServiceOrderStatus
+from app.models.service_order_item_model import ServiceOrderItem
+from app.models.sale_model import Sale, PaymentMethod
+from app.models.receivable_account_model import ReceivableAccount, ReceivableStatus
+from app.models.kardex_model import Kardex, KardexType
 
 __all__ = [
     "BaseModel",
@@ -25,4 +32,17 @@ __all__ = [
     "ProductLens",
     "LensStockGrid",
     "Customer",
+    "CashSession",
+    "CashSessionStatus",
+    "CashMovement",
+    "CashMovementType",
+    "ServiceOrder",
+    "ServiceOrderStatus",
+    "ServiceOrderItem",
+    "Sale",
+    "PaymentMethod",
+    "ReceivableAccount",
+    "ReceivableStatus",
+    "Kardex",
+    "KardexType",
 ]
