@@ -19,7 +19,10 @@ from app.models.service_order_model import (
 from app.models.staff_model import StaffMember, StaffRole
 from app.models.customer_model import Customer
 from app.models.store_model import Store
-from app.models.product_model import ProductFrame, ProductLens, InventoryLevel, LensStockGrid
+from app.models.product_frame_model import ProductFrame
+from app.models.product_lens_model import ProductLens
+from app.models.inventory_level_model import InventoryLevel
+from app.models.lens_stock_grid_model import LensStockGrid
 from app.schemas.service_order_schema import (
     ServiceOrderCreate,
     ServiceOrderUpdate,
